@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scientific Agent Skills — 134 个即用型科学研究 AI 技能</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface: '#0c0c0f',
+            card: '#16161a',
+            border: '#232329',
+            muted: '#72727e',
+            accent: '#6c63ff',
+            accent2: '#00c8a0',
+            warm: '#f0c674',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --accent: #6c63ff;
+      --accent2: #00c8a0;
+      --warm: #f0c674;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Noto Sans SC', 'Space Grotesk', sans-serif;
+      background: #0c0c0f;
+      color: #e8e8ed;
+      overflow-x: hidden;
+    }
+    .font-heading { font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif; }
+
+    /* Gradient mesh background */
+    .hero-bg {
+      position: absolute; inset: 0; overflow: hidden; z-index: 0;
+    }
+    .hero-bg::before {
+      content: '';
+      position: absolute;
+      width: 800px; height: 800px;
+      top: -200px; left: -100px;
+      background: radial-gradient(circle, rgba(108,99,255,0.15) 0%, transparent 70%);
+      filter: blur(80px);
+    }
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      bottom: -100px; right: -50px;
+      background: radial-gradient(circle, rgba(0,200,160,0.12) 0%, transparent 70%);
+      filter: blur(80px);
+    }
+
+    /* Noise texture overlay */
+    .noise {
+      position: fixed; inset: 0; z-index: 9999;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* Animations */
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse-ring { 0% { transform: scale(0.9); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    .animate-float { animation: float 6s ease-in-out infinite; }
+    .animate-fadeUp { animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) both; }
+    .animate-marquee { animation: marquee 40s linear infinite; }
+
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    .delay-400 { animation-delay: 0.4s; }
+    .delay-500 { animation-delay: 0.5s; }
+    .delay-600 { animation-delay: 0.6s; }
+
+    /* Scroll reveal */
+    .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.16,1,0.3,1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Glass card */
+    .glass {
+      background: rgba(22,22,26,0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    /* Hover tilt */
+    .tilt-card {
+      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease;
+    }
+    .tilt-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 20px 60px rgba(108,99,255,0.08), 0 0 0 1px rgba(108,99,255,0.15);
+    }
+
+    /* Stat counter */
+    .stat-pill {
+      background: linear-gradient(135deg, rgba(108,99,255,0.12), rgba(0,200,160,0.08));
+      border: 1px solid rgba(108,99,255,0.2);
+    }
+
+    /* Comparison table */
+    .compare-highlight {
+      background: linear-gradient(135deg, rgba(0,200,160,0.08), rgba(108,99,255,0.05));
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0c0c0f; }
+    ::-webkit-scrollbar-thumb { background: #2a2a32; border-radius: 3px; }
+
+    /* Focus */
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="#" class="font-heading font-bold text-lg tracking-tight flex items-center gap-2">
+        <span class="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center text-accent text-sm">🔬</span>
+        <span class="text-white">Scientific Agent Skills</span>
+      </a>
+      <div class="hidden md:flex items-center gap-8 text-sm text-muted">
+        <a href="#features" class="hover:text-white transition-colors">为什么选择</a>
+        <a href="#skills" class="hover:text-white transition-colors">技能概览</a>
+        <a href="#usecases" class="hover:text-white transition-colors">应用场景</a>
+        <a href="#compare" class="hover:text-white transition-colors">方案对比</a>
+        <a href="#faq" class="hover:text-white transition-colors">常见问题</a>
+      </div>
+      <a href="https://k-dense.ai" target="_blank"
+         class="hidden md:inline-flex items-center gap-2 px-5 py-2 rounded-full bg-accent text-white text-sm font-medium hover:bg-accent/80 transition-colors active:scale-[0.97]">
+        免费试用 K-Dense
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+      </a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="relative min-h-[100dvh] flex items-center pt-16">
+    <div class="hero-bg"></div>
+    <div class="relative z-10 max-w-7xl mx-auto px-6 py-24 grid lg:grid-cols-[1.3fr_1fr] gap-16 items-center">
+      <div>
+        <div class="animate-fadeUp">
+          <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-medium mb-8 border border-accent/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-accent2 animate-pulse"></span>
+            开放标准 · Agent Skills 兼容
+          </span>
+        </div>
+        <h1 class="font-heading text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[1.05] animate-fadeUp delay-100">
+          <span class="text-white">134 个科学技能</span><br>
+          <span class="bg-gradient-to-r from-accent via-accent2 to-warm bg-clip-text text-transparent">赋能 AI 研究代理</span>
+        </h1>
+        <p class="mt-8 text-lg text-muted leading-relaxed max-w-[55ch] animate-fadeUp delay-200">
+          覆盖生物信息学、化学信息学、临床医学、机器学习等 18 个科学领域，
+          100+ 数据库直连，70+ 优化 Python 包——将您的 AI 编码代理转变为桌面上的<strong class="text-white">"AI 科学家"</strong>。
+        </p>
+        <div class="mt-10 flex flex-wrap items-center gap-4 animate-fadeUp delay-300">
+          <a href="#getting-started"
+             class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-accent text-white font-medium hover:bg-accent/80 transition-all active:scale-[0.97]">
+            快速开始
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </a>
+          <a href="https://github.com/K-Dense-AI/scientific-agent-skills" target="_blank"
+             class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full border border-border text-muted hover:text-white hover:border-white/20 transition-all">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.754-1.335-1.754-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub 仓库
+          </a>
+        </div>
+        <!-- Stats -->
+        <div class="mt-12 flex flex-wrap gap-3 animate-fadeUp delay-400">
+          <div class="stat-pill px-5 py-2.5 rounded-2xl text-center">
+            <span class="block text-2xl font-bold font-heading text-white">134</span>
+            <span class="text-xs text-muted">科学技能</span>
+          </div>
+          <div class="stat-pill px-5 py-2.5 rounded-2xl text-center">
+            <span class="block text-2xl font-bold font-heading text-white">100+</span>
+            <span class="text-xs text-muted">数据库</span>
+          </div>
+          <div class="stat-pill px-5 py-2.5 rounded-2xl text-center">
+            <span class="block text-2xl font-bold font-heading text-white">70+</span>
+            <span class="text-xs text-muted">Python 包</span>
+          </div>
+          <div class="stat-pill px-5 py-2.5 rounded-2xl text-center">
+            <span class="block text-2xl font-bold font-heading text-white">18</span>
+            <span class="text-xs text-muted">科学领域</span>
+          </div>
+        </div>
+      </div>
+      <!-- Right side code block -->
+      <div class="hidden lg:block animate-fadeUp delay-500">
+        <div class="glass rounded-3xl p-6 relative overflow-hidden animate-float">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="w-3 h-3 rounded-full bg-[#ff5f57]"></span>
+            <span class="w-3 h-3 rounded-full bg-[#febc2e]"></span>
+            <span class="w-3 h-3 rounded-full bg-[#28c840]"></span>
+            <span class="ml-3 text-xs text-muted font-mono">terminal</span>
+          </div>
+          <pre class="text-sm leading-relaxed font-mono"><code><span class="text-muted">$</span> <span class="text-accent2">npx</span> skills add K-Dense-AI/scientific-agent-skills
+
+<span class="text-muted">✓</span> 已安装 134 个科学技能
+<span class="text-muted">✓</span> 已连接 100+ 数据库
+<span class="text-muted">✓</span> 代理自动发现已就绪
+
+<span class="text-muted">$</span> <span class="text-warm">提示：</span>查询 ChEMBL 获取 EGFR 抑制剂，
+  使用 RDKit 分析构效关系，
+  使用 DiffDock 虚拟筛选，
+  创建综合报告。
+
+<span class="text-accent2">⟩</span> 正在执行药物发现管道...
+<span class="text-accent">  ├─</span> ChEMBL 查询    <span class="text-accent2">✓</span>
+<span class="text-accent">  ├─</span> RDKit 分析     <span class="text-accent2">✓</span>
+<span class="text-accent">  ├─</span> DiffDock 对接  <span class="text-accent2">✓</span>
+<span class="text-accent">  └─</span> 报告生成      <span class="text-accent2">✓</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="border-y border-border/50 py-4 overflow-hidden">
+    <div class="animate-marquee whitespace-nowrap flex gap-8 text-sm text-muted/60">
+      <span>🧬 BioPython</span><span>🧪 RDKit</span><span>🔬 Scanpy</span><span>🤖 PyTorch</span>
+      <span>📊 Matplotlib</span><span>🧠 DeepChem</span><span>🏥 ClinVar</span><span>🌍 GeoPandas</span>
+      <span>⚗️ DiffDock</span><span>🔮 Qiskit</span><span>📚 PubMed</span><span>🧬 UniProt</span>
+      <span>🎯 scikit-learn</span><span>📈 statsmodels</span><span>🔗 STRING</span><span>🧪 ChEMBL</span>
+      <span>🧬 BioPython</span><span>🧪 RDKit</span><span>🔬 Scanpy</span><span>🤖 PyTorch</span>
+      <span>📊 Matplotlib</span><span>🧠 DeepChem</span><span>🏥 ClinVar</span><span>🌍 GeoPandas</span>
+      <span>⚗️ DiffDock</span><span>🔮 Qiskit</span><span>📚 PubMed</span><span>🧬 UniProt</span>
+      <span>🎯 scikit-learn</span><span>📈 statsmodels</span><span>🔗 STRING</span><span>🧪 ChEMBL</span>
+    </div>
+  </div>
+
+  <!-- WHY SECTION -->
+  <section id="features" class="py-32">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-20 reveal">
+        <span class="text-accent text-sm font-medium tracking-wider uppercase">为什么选择</span>
+        <h2 class="font-heading text-4xl md:text-5xl font-bold tracking-tighter mt-4 text-white">加速您的科学研究</h2>
+        <p class="mt-6 text-muted max-w-[50ch] mx-auto">从环境配置到出版级报告，一站式解决科学工作流中的每一个痛点。</p>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- Card 1 -->
+        <div class="glass rounded-2xl p-7 tilt-card reveal">
+          <div class="w-12 h-12 rounded-xl bg-accent/15 flex items-center justify-center text-2xl mb-5">⚡</div>
+          <h3 class="font-heading font-semibold text-white text-lg mb-3">节省数天工作</h3>
+          <p class="text-sm text-muted leading-relaxed">跳过 API 文档研究和集成设置，生产就绪的代码遵循科学最佳实践。</p>
+        </div>
+        <!-- Card 2 -->
+        <div class="glass rounded-2xl p-7 tilt-card reveal delay-100">
+          <div class="w-12 h-12 rounded-xl bg-accent2/15 flex items-center justify-center text-2xl mb-5">🎯</div>
+          <h3 class="font-heading font-semibold text-white text-lg mb-3">全面覆盖</h3>
+          <p class="text-sm text-muted leading-relaxed">134 个技能覆盖所有主要科学领域，78+ 数据库统一访问接口。</p>
+        </div>
+        <!-- Card 3 -->
+        <div class="glass rounded-2xl p-7 tilt-card reveal delay-200">
+          <div class="w-12 h-12 rounded-xl bg-warm/15 flex items-center justify-center text-2xl mb-5">🔧</div>
+          <h3 class="font-heading font-semibold text-white text-lg mb-3">易于集成</h3>
+          <p class="text-sm text-muted leading-relaxed">简单安装即开始使用，代理自动发现并使用相关技能，完善文档。</p>
+        </div>
+        <!-- Card 4 -->
+        <div class="glass rounded-2xl p-7 tilt-card reveal delay-300">
+          <div class="w-12 h-12 rounded-xl bg-accent/15 flex items-center justify-center text-2xl mb-5">🌟</div>
+          <h3 class="font-heading font-semibold text-white text-lg mb-3">持续维护</h3>
+          <p class="text-sm text-muted leading-relaxed">K-Dense 团队持续更新，开源社区驱动，企业级支持可选。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GETTING STARTED -->
+  <section id="getting-started" class="py-24 relative">
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, rgba(108,99,255,0.06) 0%, transparent 70%);"></div>
+    <div class="relative z-10 max-w-4xl mx-auto px-6">
+      <div class="text-center mb-16 reveal">
+        <span class="text-accent2 text-sm font-medium tracking-wider uppercase">快速开始</span>
+        <h2 class="font-heading text-4xl md:text-5xl font-bold tracking-tighter mt-4 text-white">一条命令，即刻启用</h2>
+        <p class="mt-6 text-muted">支持 Cursor、Claude Code、Codex、Gemini CLI 等任何兼容 Agent Skills 标准的代理。</p>
+      </div>
+      <!-- Step cards -->
+      <div class="space-y-6 reveal">
+        <div class="glass rounded-2xl p-8 flex gap-6 items-start tilt-card">
+          <span class="shrink-0 w-10 h-10 rounded-full bg-accent/20 text-accent font-bold flex items-center justify-center font-heading">1</span>
+          <div>
+            <h3 class="font-heading font-semibold text-white mb-2">安装技能集</h3>
+            <div class="bg-surface rounded-xl p-4 font-mono text-sm border border-border">
+              <span class="text-muted">$</span> <span class="text-accent2">npx</span> skills add K-Dense-AI/scientific-agent-skills
+            </div>
+          </div>
+        </div>
+        <div class="glass rounded-2xl p-8 flex gap-6 items-start tilt-card">
+          <span class="shrink-0 w-10 h-10 rounded-full bg-accent2/20 text-accent2 font-bold flex items-center justify-center font-heading">2</span>
+          <div>
+            <h3 class="font-heading font-semibold text-white mb-2">自动发现</h3>
+            <p class="text-sm text-muted">AI 代理自动发现并使用相关技能，您也可以在提示中手动指定技能名称。</p>
+          </div>
+        </div>
+        <div class="glass rounded-2xl p-8 flex gap-6 items-start tilt-card">
+          <span class="shrink-0 w-10 h-10 rounded-full bg-warm/20 text-warm font-bold flex items-center justify-center font-heading">3</span>
+          <div>
+            <h3 class="font-heading font-semibold text-white mb-2">开始科学研究</h3>
+            <p class="text-sm text-muted">通过自然语言提示执行复杂的多步骤科学工作流程，从药物发现到基因组分析。</p>
+          </div>
+        </div>
+      </div>
+      <!-- Prerequisites -->
+      <div class="mt-12 glass rounded-2xl p-8 reveal">
+        <h4 class="font-heading font-semibold text-white mb-4">⚙️ 先决条件</h4>
+        <div class="grid sm:grid-cols-2 gap-4 text-sm text-muted">
+          <div class="flex items-center gap-3"><span class="text-accent2">✓</span> Python 3.11+（推荐 3.12+）</div>
+          <div class="flex items-center gap-3"><span class="text-accent2">✓</span> uv 包管理器</div>
+          <div class="flex items-center gap-3"><span class="text-accent2">✓</span> 兼容 Agent Skills 标准的代理</div>
+          <div class="flex items-center gap-3"><span class="text-accent2">✓</span> macOS / Linux / Windows WSL2</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS OVERVIEW -->
+  <section id="skills" class="py-32">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-20 reveal">
+        <span class="text-warm text-sm font-medium tracking-wider uppercase">技能概览</span>
+        <h2 class="font-heading text-4xl md:text-5xl font-bold tracking-tighter mt-4 text-white">18 个科学领域，全面覆盖</h2>
+        <p class="mt-6 text-muted max-w-[55ch] mx-auto">每个技能都包含全面的文档、实用代码示例、用例和最佳实践。</p>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Skill cards -->
+        <div class="glass rounded-2xl p-6 tilt-card reveal">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-2xl">🧬</span>
+            <h3 class="font-heading font-semibold text-white">生物信息学与基因组学</h3>
+          </div>
+          <p class="text-sm text-muted mb-4">21+ 技能</p>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">BioPython</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">Scanpy</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">pysam</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">scVelo</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">PyDESeq2</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">TileDB-VCF</span>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-6 tilt-card reveal delay-100">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-2xl">🧪</span>
+            <h3 class="font-heading font-semibold text-white">化学信息学与药物发现</h3>
+          </div>
+          <p class="text-sm text-muted mb-4">10+ 技能</p>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">RDKit</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">DiffDock</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">DeepChem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">OpenMM</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">Rowan</span>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-6 tilt-card reveal delay-200">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-2xl">🏥</span>
+            <h3 class="font-heading font-semibold text-white">临床研究与精准医学</h3>
+          </div>
+          <p class="text-sm text-muted mb-4">8+ 技能</p>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">ClinVar</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">COSMIC</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">FDA</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">PyHealth</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">DepMap</span>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-6 tilt-card reveal">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-2xl">🤖</span>
+            <h3 class="font-heading font-semibold text-white">机器学习与 AI</h3>
+          </div>
+          <p class="text-sm text-muted mb-4">16+ 技能</p>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">PyTorch</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">scikit-learn</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">SHAP</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">PyMC</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">TimesFM</span>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-6 tilt-card reveal delay-100">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-2xl">📊</span>
+            <h3 class="font-heading font-semibold text-white">数据分析与可视化</h3>
+          </div>
+          <p class="text-sm text-muted mb-4">16+ 技能</p>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">Matplotlib</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">Seaborn</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">GeoPandas</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">NetworkX</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">Polars</span>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-6 tilt-card reveal delay-200">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-2xl">📚</span>
+            <h3 class="font-heading font-semibold text-white">科学交流</h3>
+          </div>
+          <p class="text-sm text-muted mb-4">20+ 技能</p>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">PubMed</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">arXiv</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">LaTeX</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">科学写作</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">同行评审</span>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-6 tilt-card reveal">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-2xl">🔮</span>
+            <h3 class="font-heading font-semibold text-white">材料科学与物理</h3>
+          </div>
+          <p class="text-sm text-muted mb-4">7 技能</p>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">Pymatgen</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">Qiskit</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">PennyLane</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">Astropy</span>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-6 tilt-card reveal delay-100">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-2xl">🧪</span>
+            <h3 class="font-heading font-semibold text-white">实验室自动化</h3>
+          </div>
+          <p class="text-sm text-muted mb-4">4 技能</p>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">PyLabRobot</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">Ginkgo</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">Benchling</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">Protocols.io</span>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-6 tilt-card reveal delay-200">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-2xl">🔬</span>
+            <h3 class="font-heading font-semibold text-white">科学数据库</h3>
+          </div>
+          <p class="text-sm text-muted mb-4">5 技能 → 100+ 数据库</p>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">PubChem</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">UniProt</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">PDB</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">KEGG</span>
+            <span class="px-2.5 py-1 rounded-lg bg-surface text-xs text-muted border border-border">PrimeKG</span>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mt-12 reveal">
+        <a href="https://github.com/K-Dense-AI/scientific-agent-skills/blob/main/docs/scientific-skills.md" target="_blank"
+           class="inline-flex items-center gap-2 text-accent hover:text-accent2 transition-colors text-sm font-medium">
+          查看全部 134 个技能详情
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- USE CASES -->
+  <section id="usecases" class="py-32 relative">
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse at 30% 50%, rgba(0,200,160,0.05) 0%, transparent 60%);"></div>
+    <div class="relative z-10 max-w-7xl mx-auto px-6">
+      <div class="text-center mb-20 reveal">
+        <span class="text-accent2 text-sm font-medium tracking-wider uppercase">应用场景</span>
+        <h2 class="font-heading text-4xl md:text-5xl font-bold tracking-tighter mt-4 text-white">从想法到成果，一个提示</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Use case 1 -->
+        <div class="glass rounded-2xl p-8 tilt-card reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="text-2xl">🧪</span>
+            <h3 class="font-heading font-semibold text-white text-lg">药物发现与药物化学</h3>
+          </div>
+          <ul class="space-y-3 text-sm text-muted">
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> 从 PubChem/ZINC 虚拟筛选数百万化合物</li>
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> 使用 RDKit 分析构效关系，datamol 生成类似物</li>
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> DeepChem 预测 ADMET，DiffDock 分子对接</li>
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> ChEMBL 挖掘生物活性数据</li>
+          </ul>
+        </div>
+        <!-- Use case 2 -->
+        <div class="glass rounded-2xl p-8 tilt-card reveal delay-100">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="text-2xl">🧬</span>
+            <h3 class="font-heading font-semibold text-white text-lg">生物信息学与基因组学</h3>
+          </div>
+          <ul class="space-y-3 text-sm text-muted">
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> BioPython、pysam 处理 DNA/RNA/蛋白质序列</li>
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> Scanpy 单细胞 RNA-seq 分析，Arboreto 推断 GRN</li>
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> Ensembl VEP 变异注释，ClinVar 致病性查询</li>
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> STRING 蛋白质相互作用，KEGG/Reactome 通路映射</li>
+          </ul>
+        </div>
+        <!-- Use case 3 -->
+        <div class="glass rounded-2xl p-8 tilt-card reveal">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="text-2xl">🏥</span>
+            <h3 class="font-heading font-semibold text-white text-lg">临床研究与精准医学</h3>
+          </div>
+          <ul class="space-y-3 text-sm text-muted">
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> ClinicalTrials.gov 搜索相关临床试验</li>
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> ClinVar、COSMIC、ClinPGx 变异解读</li>
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> FDA 数据库查询药物安全信息</li>
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> 患者变异匹配靶向治疗方案</li>
+          </ul>
+        </div>
+        <!-- Use case 4 -->
+        <div class="glass rounded-2xl p-8 tilt-card reveal delay-100">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="text-2xl">🔬</span>
+            <h3 class="font-heading font-semibold text-white text-lg">多组学与系统生物学</h3>
+          </div>
+          <ul class="space-y-3 text-sm text-muted">
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> 整合 RNA-seq、蛋白质组学和代谢组学数据</li>
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> KEGG/Reactome 通路富集分析</li>
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> 重建基因调控网络，识别枢纽基因</li>
+            <li class="flex items-start gap-2"><span class="text-accent2 mt-0.5">›</span> 多组学整合预测患者结果</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKFLOW EXAMPLES -->
+  <section class="py-24">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-center mb-16 reveal">
+        <span class="text-accent text-sm font-medium tracking-wider uppercase">工作流示例</span>
+        <h2 class="font-heading text-4xl md:text-5xl font-bold tracking-tighter mt-4 text-white">复杂管道，简单提示</h2>
+      </div>
+      <div class="space-y-8">
+        <!-- Example 1 -->
+        <div class="glass rounded-2xl overflow-hidden reveal">
+          <div class="px-8 py-5 border-b border-border/50 flex items-center gap-3">
+            <span class="text-lg">🧪</span>
+            <h3 class="font-heading font-semibold text-white">药物发现管道</h3>
+            <span class="ml-auto text-xs text-muted">8 个技能协同</span>
+          </div>
+          <div class="p-8">
+            <div class="bg-surface rounded-xl p-5 font-mono text-sm text-muted border border-border leading-relaxed mb-6">
+              查询 ChEMBL 获取 EGFR 抑制剂（IC50 &lt; 50nM），使用 RDKit 分析构效关系，使用 datamol 生成改进的类似物，使用 DiffDock 针对 AlphaFold EGFR 结构进行虚拟筛选，在 PubMed 中搜索耐药机制，在 COSMIC 中检查突变，并创建可视化和综合报告。
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1.5 rounded-lg bg-accent/10 text-accent text-xs border border-accent/20">ChEMBL</span>
+              <span class="px-3 py-1.5 rounded-lg bg-accent/10 text-accent text-xs border border-accent/20">RDKit</span>
+              <span class="px-3 py-1.5 rounded-lg bg-accent/10 text-accent text-xs border border-accent/20">datamol</span>
+              <span class="px-3 py-1.5 rounded-lg bg-accent/10 text-accent text-xs border border-accent/20">DiffDock</span>
+              <span class="px-3 py-1.5 rounded-lg bg-accent/10 text-accent text-xs border border-accent/20">AlphaFold</span>
+              <span class="px-3 py-1.5 rounded-lg bg-accent/10 text-accent text-xs border border-accent/20">PubMed</span>
+              <span class="px-3 py-1.5 rounded-lg bg-accent/10 text-accent text-xs border border-accent/20">COSMIC</span>
+            </div>
+          </div>
+        </div>
+        <!-- Example 2 -->
+        <div class="glass rounded-2xl overflow-hidden reveal">
+          <div class="px-8 py-5 border-b border-border/50 flex items-center gap-3">
+            <span class="text-lg">🔬</span>
+            <h3 class="font-heading font-semibold text-white">单细胞 RNA-seq 全流程分析</h3>
+            <span class="ml-auto text-xs text-muted">8 个技能协同</span>
+          </div>
+          <div class="p-8">
+            <div class="bg-surface rounded-xl p-5 font-mono text-sm text-muted border border-border leading-relaxed mb-6">
+              使用 Scanpy 加载 10X 数据集，执行 QC 和双细胞去除，与 Cellxgene Census 数据整合，使用 NCBI Gene 标记识别细胞类型，使用 PyDESeq2 运行差异表达，使用 Arboreto 推断基因调控网络，通过 Reactome/KEGG 丰富通路，并使用 Open Targets 识别治疗靶点。
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1.5 rounded-lg bg-accent2/10 text-accent2 text-xs border border-accent2/20">Scanpy</span>
+              <span class="px-3 py-1.5 rounded-lg bg-accent2/10 text-accent2 text-xs border border-accent2/20">Cellxgene</span>
+              <span class="px-3 py-1.5 rounded-lg bg-accent2/10 text-accent2 text-xs border border-accent2/20">NCBI Gene</span>
+              <span class="px-3 py-1.5 rounded-lg bg-accent2/10 text-accent2 text-xs border border-accent2/20">PyDESeq2</span>
+              <span class="px-3 py-1.5 rounded-lg bg-accent2/10 text-accent2 text-xs border border-accent2/20">Arboreto</span>
+              <span class="px-3 py-1.5 rounded-lg bg-accent2/10 text-accent2 text-xs border border-accent2/20">Reactome</span>
+              <span class="px-3 py-1.5 rounded-lg bg-accent2/10 text-accent2 text-xs border border-accent2/20">Open Targets</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON -->
+  <section id="compare" class="py-32 relative">
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse at 70% 30%, rgba(108,99,255,0.05) 0%, transparent 60%);"></div>
+    <div class="relative z-10 max-w-5xl mx-auto px-6">
+      <div class="text-center mb-16 reveal">
+        <span class="text-accent text-sm font-medium tracking-wider uppercase">方案对比</span>
+        <h2 class="font-heading text-4xl md:text-5xl font-bold tracking-tighter mt-4 text-white">选择适合您的方案</h2>
+      </div>
+      <div class="glass rounded-2xl overflow-hidden reveal">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-border">
+                <th class="text-left px-8 py-5 text-muted font-medium">功能</th>
+                <th class="px-8 py-5 text-white font-semibold">开源仓库</th>
+                <th class="px-8 py-5 text-accent font-semibold compare-highlight rounded-t-xl">K-Dense Web</th>
+              </tr>
+            </thead>
+            <tbody class="text-muted">
+              <tr class="border-b border-border/50">
+                <td class="px-8 py-4">科学技能</td>
+                <td class="px-8 py-4 text-center">134 个</td>
+                <td class="px-8 py-4 text-center compare-highlight font-medium text-white">200+ 个</td>
+              </tr>
+              <tr class="border-b border-border/50">
+                <td class="px-8 py-4">设置</td>
+                <td class="px-8 py-4 text-center">手动安装</td>
+                <td class="px-8 py-4 text-center compare-highlight font-medium text-white">零设置，即时可用</td>
+              </tr>
+              <tr class="border-b border-border/50">
+                <td class="px-8 py-4">计算资源</td>
+                <td class="px-8 py-4 text-center">本地机器</td>
+                <td class="px-8 py-4 text-center compare-highlight font-medium text-white">云 GPU & HPC</td>
+              </tr>
+              <tr class="border-b border-border/50">
+                <td class="px-8 py-4">工作流程</td>
+                <td class="px-8 py-4 text-center">提示和代码</td>
+                <td class="px-8 py-4 text-center compare-highlight font-medium text-white">端到端研究管道</td>
+              </tr>
+              <tr class="border-b border-border/50">
+                <td class="px-8 py-4">输出</td>
+                <td class="px-8 py-4 text-center">代码和分析</td>
+                <td class="px-8 py-4 text-center compare-highlight font-medium text-white">出版级图表和报告</td>
+              </tr>
+              <tr>
+                <td class="px-8 py-4">集成</td>
+                <td class="px-8 py-4 text-center">本地工具</td>
+                <td class="px-8 py-4 text-center compare-highlight font-medium text-white rounded-b-xl">实验室系统 & ELN</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- CTA -->
+      <div class="mt-12 glass rounded-2xl p-10 text-center reveal">
+        <blockquote class="text-lg text-muted/80 italic mb-4 max-w-[50ch] mx-auto leading-relaxed">
+          "K-Dense Web 让我在一个下午内从原始测序数据获得草稿图表。以前需要三天的环境设置和脚本编写。"
+        </blockquote>
+        <p class="text-sm text-muted mb-8">— 计算生物学家，药物发现</p>
+        <div class="flex flex-col items-center gap-4">
+          <a href="https://k-dense.ai" target="_blank"
+             class="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-accent to-accent2 text-white font-semibold text-lg hover:opacity-90 transition-opacity active:scale-[0.97]">
+            免费试用 · 50 美元免费额度
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+          </a>
+          <span class="text-xs text-muted">无需信用卡 · 几分钟内开始</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="py-32">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-center mb-16 reveal">
+        <span class="text-warm text-sm font-medium tracking-wider uppercase">常见问题</span>
+        <h2 class="font-heading text-4xl md:text-5xl font-bold tracking-tighter mt-4 text-white">FAQ</h2>
+      </div>
+      <div class="space-y-4 reveal">
+        <details class="glass rounded-2xl group" open>
+          <summary class="px-8 py-5 cursor-pointer flex items-center justify-between text-white font-medium hover:text-accent transition-colors">
+            这个项目是免费使用的吗？
+            <svg class="w-5 h-5 text-muted transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+          </summary>
+          <div class="px-8 pb-6 text-sm text-muted leading-relaxed">
+            是的！此仓库采用 MIT 许可证开源。每个单独的技能在其 SKILL.md 文件中可能有自己的许可证，请务必查看相关条款。
+          </div>
+        </details>
+        <details class="glass rounded-2xl group">
+          <summary class="px-8 py-5 cursor-pointer flex items-center justify-between text-white font-medium hover:text-accent transition-colors">
+            可以用于商业项目吗？
+            <svg class="w-5 h-5 text-muted transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+          </summary>
+          <div class="px-8 pb-6 text-sm text-muted leading-relaxed">
+            仓库本身采用 MIT 许可证，允许商业使用。但单独的技能可能有不同的许可证——请检查每个技能的 SKILL.md 文件中的 license 字段。
+          </div>
+        </details>
+        <details class="glass rounded-2xl group">
+          <summary class="px-8 py-5 cursor-pointer flex items-center justify-between text-white font-medium hover:text-accent transition-colors">
+            支持哪些 AI 代理平台？
+            <svg class="w-5 h-5 text-muted transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+          </summary>
+          <div class="px-8 pb-6 text-sm text-muted leading-relaxed">
+            技能遵循开放 Agent Skills 标准，可与 Cursor、Claude Code、Codex、Gemini CLI 以及任何兼容该标准的代理一起使用。
+          </div>
+        </details>
+        <details class="glass rounded-2xl group">
+          <summary class="px-8 py-5 cursor-pointer flex items-center justify-between text-white font-medium hover:text-accent transition-colors">
+            需要安装所有 Python 包吗？
+            <svg class="w-5 h-5 text-muted transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+          </summary>
+          <div class="px-8 pb-6 text-sm text-muted leading-relaxed">
+            不需要！只安装您实际使用的包。每个技能在其 SKILL.md 文件中指定依赖项，按需安装即可。
+          </div>
+        </details>
+        <details class="glass rounded-2xl group">
+          <summary class="px-8 py-5 cursor-pointer flex items-center justify-between text-white font-medium hover:text-accent transition-colors">
+            为什么将所有技能组合在一起？
+            <svg class="w-5 h-5 text-muted transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+          </summary>
+          <div class="px-8 pb-6 text-sm text-muted leading-relaxed">
+            在 AI 时代，优秀的科学本质上是跨学科的。统一的技能集让您能轻松跨越领域——在一个工作流中结合基因组学、化学信息学、临床数据和机器学习，无需考虑安装问题。
+          </div>
+        </details>
+        <details class="glass rounded-2xl group">
+          <summary class="px-8 py-5 cursor-pointer flex items-center justify-between text-white font-medium hover:text-accent transition-colors">
+            技能可以离线使用吗？
+            <svg class="w-5 h-5 text-muted transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+          </summary>
+          <div class="px-8 pb-6 text-sm text-muted leading-relaxed">
+            数据库类技能需要联网查询 API。Python 包类技能在安装依赖项后可以离线使用。
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section class="py-24 relative">
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, rgba(240,198,116,0.04) 0%, transparent 60%);"></div>
+    <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+      <div class="reveal">
+        <h2 class="font-heading text-4xl md:text-5xl font-bold tracking-tighter text-white mb-6">加入我们的社区</h2>
+        <p class="text-muted text-lg max-w-[50ch] mx-auto mb-10">
+          与使用 AI 代理进行科学计算的科学家、研究人员和 AI 爱好者交流、协作。
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="https://join.slack.com/t/k-densecommunity/shared_invite/zt-3iajtyls1-EwmkwIZk0g_o74311Tkf5g" target="_blank"
+             class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-white/5 border border-border text-white hover:bg-white/10 transition-colors">
+            💬 加入 Slack 社区
+          </a>
+          <a href="https://github.com/K-Dense-AI/scientific-agent-skills" target="_blank"
+             class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-white/5 border border-border text-white hover:bg-white/10 transition-colors">
+            ⭐ GitHub 加星
+          </a>
+          <a href="https://x.com/k_dense_ai" target="_blank"
+             class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-white/5 border border-border text-white hover:bg-white/10 transition-colors">
+            𝕏 关注 X
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTRIBUTE -->
+  <section class="py-24">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="glass rounded-3xl p-10 md:p-14 grid md:grid-cols-2 gap-10 items-center reveal">
+        <div>
+          <h2 class="font-heading text-3xl font-bold tracking-tighter text-white mb-5">参与贡献</h2>
+          <p class="text-muted leading-relaxed mb-6">
+            我们欢迎贡献——添加新技能、改进文档、修复错误或建议新功能。遵循 Agent Skills 规范，确保代码示例经过测试。
+          </p>
+          <div class="space-y-3 text-sm text-muted">
+            <div class="flex items-center gap-3"><span class="text-accent2">✓</span> 遵守 Agent Skills 规范</div>
+            <div class="flex items-center gap-3"><span class="text-accent2">✓</span> 包含全面的 SKILL.md 文件</div>
+            <div class="flex items-center gap-3"><span class="text-accent2">✓</span> 确保代码示例经过测试</div>
+            <div class="flex items-center gap-3"><span class="text-accent2">✓</span> 运行 Cisco AI 安全扫描</div>
+          </div>
+        </div>
+        <div class="bg-surface rounded-2xl p-6 font-mono text-sm border border-border">
+          <div class="text-muted leading-relaxed space-y-1">
+            <p><span class="text-accent2">1.</span> Fork 仓库</p>
+            <p><span class="text-accent2">2.</span> git checkout -b feature/amazing-skill</p>
+            <p><span class="text-accent2">3.</span> 遵循现有目录结构</p>
+            <p><span class="text-accent2">4.</span> 包含全面的 SKILL.md</p>
+            <p><span class="text-accent2">5.</span> 彻底测试示例</p>
+            <p><span class="text-accent2">6.</span> 提交拉取请求</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-border/50 py-16">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="w-7 h-7 rounded-lg bg-accent/20 flex items-center justify-center text-accent text-xs">🔬</span>
+            <span class="font-heading font-bold text-white">Scientific Agent Skills</span>
+          </div>
+          <p class="text-sm text-muted leading-relaxed">
+            由 K-Dense 创建的 134 个即用型科学研究 AI 技能。MIT 许可证开源。
+          </p>
+        </div>
+        <div>
+          <h4 class="font-heading font-semibold text-white mb-4 text-sm">资源</h4>
+          <ul class="space-y-2.5 text-sm text-muted">
+            <li><a href="https://github.com/K-Dense-AI/scientific-agent-skills" target="_blank" class="hover:text-white transition-colors">GitHub 仓库</a></li>
+            <li><a href="https://github.com/K-Dense-AI/scientific-agent-skills/blob/main/docs/scientific-skills.md" target="_blank" class="hover:text-white transition-colors">技能文档</a></li>
+            <li><a href="https://github.com/K-Dense-AI/scientific-agent-skills/blob/main/docs/examples.md" target="_blank" class="hover:text-white transition-colors">工作流示例</a></li>
+            <li><a href="https://agentskills.io/" target="_blank" class="hover:text-white transition-colors">Agent Skills 标准</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-heading font-semibold text-white mb-4 text-sm">产品</h4>
+          <ul class="space-y-2.5 text-sm text-muted">
+            <li><a href="https://k-dense.ai" target="_blank" class="hover:text-white transition-colors">K-Dense Web</a></li>
+            <li><a href="https://github.com/K-Dense-AI/k-dense-byok" target="_blank" class="hover:text-white transition-colors">K-Dense BYOK</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-heading font-semibold text-white mb-4 text-sm">社区</h4>
+          <ul class="space-y-2.5 text-sm text-muted">
+            <li><a href="https://join.slack.com/t/k-densecommunity/shared_invite/zt-3iajtyls1-EwmkwIZk0g_o74311Tkf5g" target="_blank" class="hover:text-white transition-colors">Slack</a></li>
+            <li><a href="https://x.com/k_dense_ai" target="_blank" class="hover:text-white transition-colors">X / Twitter</a></li>
+            <li><a href="https://www.linkedin.com/company/k-dense-inc" target="_blank" class="hover:text-white transition-colors">LinkedIn</a></li>
+            <li><a href="https://www.youtube.com/@K-Dense-Inc" target="_blank" class="hover:text-white transition-colors">YouTube</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-border/50 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-muted">© 2026 K-Dense Inc. MIT 许可证。</p>
+        <div class="flex items-center gap-4 text-xs text-muted">
+          <a href="https://github.com/K-Dense-AI/scientific-agent-skills/blob/main/LICENSE.md" target="_blank" class="hover:text-white transition-colors">许可证</a>
+          <a href="https://github.com/K-Dense-AI/scientific-agent-skills/blob/main/docs/open-source-sponsors.md" target="_blank" class="hover:text-white transition-colors">支持开源</a>
+          <a href="https://github.com/K-Dense-AI/scientific-agent-skills/issues" target="_blank" class="hover:text-white transition-colors">反馈</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll Reveal Script -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  </script>
+</body>
+</html>
