@@ -1,5 +1,7 @@
 # 科学智能体技能集
 
+> **本文档汉化自 https://github.com/K-Dense-AI/scientific-agent-skills**
+
 > **🔔 Claude Scientific Skills 现已更名为 Scientific Agent Skills。** 技能相同，兼容性更广 — 现在可与任何支持开放 [Agent Skills](https://agentskills.io/) 标准的 AI 智能体配合使用，不仅限于 Claude。
 
 > **新增：[K-Dense BYOK](https://github.com/K-Dense-AI/k-dense-byok)** — 一款在您的桌面上运行的免费开源 AI 共同科学家，由 Scientific Agent Skills 驱动。自带 API 密钥，从 40+ 模型中选择，获得完整的研究工作区，包括网络搜索、文件处理、100+ 科学数据库，以及访问本仓库中的所有 134 个技能。您的数据保留在您的计算机上，并可通过 [Modal](https://modal.com/) 可选扩展到云端计算以处理繁重的工作负载。[从这里开始。](https://github.com/K-Dense-AI/k-dense-byok)
